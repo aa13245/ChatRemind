@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=0.75">
+    <title>ChatRemind</title>
+    <link rel="stylesheet" href="public/styles.css">
+</head>
+<body>
+    <div class="layout">
+        <a href="/"><button id="logo" href="/">ChatRemind</button></a>
+        <a href="/mypage"><button id="logout-button">마이페이지</button></a>
+        <a id = "line"></span>
+        <a href="/auth/logout"><button id="logout-button">로그아웃</button></a>
+    </div>
+</body>
+<body>
+    <div class="chat-container">
+        <div id="chat-log">
+            <!-- 채팅 내용이 표시될 곳 -->
+        </div>
+        <input type="text" id="user-input" placeholder="메시지 입력" required autofocus>
+        <button id="send-button">전송</button>
+        <button id="mic">🎤</button>
+    </div>
+    <div class="chat-container">
+        <input type="text" id="memo" placeholder="리마인더">
+        <input type="datetime-local" id="reminder-time" name="reminder-time">
+        <button id="save-button">저장</button>
+    </div>
+    <script>
+        const chatLog = document.getElementById('chat-log');
+        const userInput = document.getElementById('user-input');
+        const sendButton = document.getElementById('send-button');
+        const memo = document.getElementById('memo');
+        const saveButton = document.getElementById('save-button');
+        const timeinput = document.getElementById('reminder-time');
+        const mySynth = window.speechSynthesis; //js 내장 tts api
+        const speech = new webkitSpeechRecognition; //크롬 stt api
+
+        //페이지 로드 시점의 날짜 (리마인더 생성창 기본값)
+        const reloadtime = new Date();
+        timeinput.value = reloadtime.getFullYear().toString()+'-'+String(reloadtime.getMonth() + 1).padStart(2, '0')+'-'+String(reloadtime.getDate()).padStart(2, '0')+'T00:00';
+        
+        //채팅 엔터 키를 눌렀을 때 전송
+        function sendMessageOnEnter(event) {
+            if (event.key === 'Enter') {
+                sendButton.click();
+            }
+        }
+        //리마인더 엔터 키를 눌렀을 때 저장
+        function saveOnEnter(event) {
+            if (event.key === 'Enter') {
+                saveButton.click();
+            }
+        }
+        //엔터 키를 눌렀을 때 이벤트 핸들러
+        userInput.addEventListener('keydown', sendMessageOnEnter); 
+        memo.addEventListener('keydown', saveOnEnter);
+        
+        //마이크 버튼을 누르고 음성 전송
+        document.getElementById("mic").addEventListener("click", () => {
+            speech.start();
+        })
+        speech.addEventListener("result", (event) => {
+            const { transcript } = event["results"][0][0];
+            userInput.value = transcript;
+            sendButton.click();
+        })
+
+        //시간이 된 리마인더가 있는지 체크
+        async function getGPTalertresponse(data){
+            const reminders = data;
+            const currentDate = new Date();
+            const year = currentDate.getFullYear().toString().slice(-2);
+            const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+            const day = String(currentDate.getDate()).padStart(2, '0');
+            const currentTime = new Date();
+            const hours = currentTime.getHours().toString().padStart(2, '0');
+            const minutes = currentTime.getMinutes().toString().padStart(2, '0');
+            const time = hours + minutes;
+            const reminderdata = [];
+            reminders.forEach(reminder => { //저장된 리마인더들 중 현재시간과 일치하며, 알림이 발생하지 않았던 리마인더를 확인 
+                if (reminder.date == year+month+day && reminder.time == time && reminder.alert != 1){
+                    console.log(reminder.alert);
+                    reminderdata.push('id:'+reminder.id+',content:'+reminder.content+',date:'+reminder.date+',time:'+reminder.time);
+                };
+            });
+            const reminderdataform = 'day:20'+year+'-'+ month+'-'+ day +',time:'+time+'리마인더:'+JSON.stringify(reminderdata);
+            //알림이 필요한 리마인더가 있을 경우 알림채팅을 요청
+            if (reminderdata.length!=0){
+                const response = await fetch('/chat/getalertmessage', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ reminderdataform })
+                });
+                const responsedata = await response.json();
+                const utterance = new SpeechSynthesisUtterance(responsedata);
+                mySynth.speak(utterance); //tts 출력
+                displayAIReply('6'+responsedata);
+                wating =0;
+                clearInterval(interval);
+            }
+            else wating = 1;
+        }
+
+        //알림을 위해 리마인더 데이터를 불러옴, 알림 발생시 데이터를 다시 불러옴 (중복 알림 방지)
+        let wating = 0;
+        let interval;
+        setInterval(function() {
+                if (wating == 0){
+                    wating = 1;
+                    fetch('/chat/alert')
+                        .then(response => response.json())
+                        .then(data => {
+                            //5초마다 시간이 된 리마인더가 있는지 확인
+                            interval = setInterval(() => {
+                                if (wating == 1){
+                                    wating = 2;
+                                    if (data.reminders.length!=0) {
+                                        getGPTalertresponse(data.reminders);
+                                    }
+                                }
+                            }, 5000);
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                        });
+                };
+        }, 5000);
+
+        //새로고침시 채팅 기록 출력
+        fetch('/chat/getlogs')
+            .then(response => response.json())
+            .then(data => {
+                const chatlogs = data;
+                chatlogs.forEach(chatlog => {
+                appendMessage(chatlog.role, chatlog.content)
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        //새로고침시 리마인더 출력
+        fetch('/reminder/getreminders') 
+            .then(response => response.json())
+            .then(data => {
+                const reminders = data;
+                reminders.forEach(reminder => {
+                    const reminder_ = document.createElement('div');
+                    const remindercontent = document.createElement('div');
+                    const memo = document.createElement('a');
+                    const daytime = document.createElement('div');
+                    const delbutton = document.createElement('button');
+                    const modifybutton = document.createElement('button');
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    if (reminder.completed == '완료') checkbox.checked = true;                    
+
+                    reminder_.classList.add('chat-container');
+                    daytime.classList.add('daytime-container');
+                    delbutton.classList.add('del-button');
+                    modifybutton.classList.add('del-button');
+                    let hour = parseInt(reminder.time.slice(0, 2));
+                    let period = '오전 ';
+                    if (hour >= 12) {
+                        period = '오후 ';
+                        if (hour > 12){
+                            hour -= 12;
+                        }
+                    }
+                    if (hour == 0) hour = 12;
+                    memo.innerText = '　'+ reminder.content + '\n';
+                    daytime.innerText = '　　　20' + reminder.date.slice(0, 2) + '년 ' + reminder.date.slice(2, 4) + '월 ' + reminder.date.slice(4, 6) + '일, '
+                                        + period + hour + ':' + reminder.time.slice(2.4);
+                    delbutton.innerText = '삭제';
+                    modifybutton.innerText = '수정';
+
+                    document.body.appendChild(reminder_);
+                    remindercontent.appendChild(checkbox);
+                    remindercontent.appendChild(memo);
+                    reminder_.appendChild(remindercontent);
+                    reminder_.appendChild(daytime);
+                    remindercontent.appendChild(delbutton);
+                    remindercontent.appendChild(modifybutton);
+                    
+                    //완료 버튼 클릭 이벤트 처리
+                    checkbox.addEventListener('click', async () => {
+                        try {
+                            await fetch('/reminder/complete', {
+                                method: 'PUT',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({ reminder }),
+                            });
+                        } catch (error) {
+                            console.error(error);
+                        }
+                    });
+
+                    // 삭제 버튼 클릭 이벤트 처리
+                    delbutton.addEventListener('click', async () => {
+                        try {
+                            await fetch('/reminder/delete', {
+                                method: 'DELETE',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({ reminder }),
+                            });
+                            location.reload();
+                        } catch (error) {
+                            console.error(error);
+                        }
+                    });
+
+                    // 수정 버튼 클릭 이벤트
+                    modifybutton.addEventListener('click', async() =>{
+                        try{
+                            //기존내용 제거
+                            remindercontent.remove();
+                            daytime.remove();
+                            delbutton.remove();
+                            modifybutton.remove();
+
+                            //수정 창 생성
+                            const modifycontent = document.createElement('input');
+                            const modifytime = document.createElement('input');
+                            modifytime.type = 'datetime-local';
+                            const modifycancel = document.createElement('button');
+                            const modifyconfirm = document.createElement('button');
+
+                            modifycontent.classList.add('memo-modify');
+                            modifytime.classList.add('reminder-time');
+                            modifycancel.classList.add('cancel-button');
+                            modifyconfirm.classList.add('confirm-button');
+
+                            modifycontent.value = reminder.content;
+                            modifytime.value = '20' + reminder.date.slice(0, 2) + '-' + reminder.date.slice(2, 4) + '-' + reminder.date.slice(4, 6) +
+                                                'T' + reminder.time.slice(0, 2) + ':' + reminder.time.slice(2, 4);
+                            modifycancel.innerText = '취소';
+                            modifyconfirm.innerText = '저장';
+
+                            reminder_.appendChild(modifycontent);
+                            reminder_.appendChild(modifytime);
+                            reminder_.appendChild(modifyconfirm);
+                            reminder_.appendChild(modifycancel);
+                            //취소 버튼 클릭 이벤트
+                            modifycancel.addEventListener('click', async () => {
+                                modifycontent.remove();
+                                modifytime.remove();
+                                modifycancel.remove();
+                                modifyconfirm.remove();
+                                reminder_.appendChild(remindercontent);
+                                reminder_.appendChild(daytime);
+                                remindercontent.appendChild(delbutton);
+                                remindercontent.appendChild(modifybutton);
+                            });
+                            // 내용 수정 엔터 눌렀을 때
+                            function confirmOnEnter(event) {
+                                if (event.key === 'Enter') {
+                                    modifyconfirm.click();
+                                }
+                            }
+                            //저장 버튼 클릭 이벤트
+                            modifyconfirm.addEventListener('click', async () => {
+                                const currentDate = new Date();
+                                const year = currentDate.getFullYear().toString().slice(-2);
+                                const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+                                const day = String(currentDate.getDate()).padStart(2, '0');
+                                const content = modifycontent.value;
+                                const id = reminder.id;
+                                const selectedDate = new Date(modifytime.value);
+                                let date = selectedDate.getFullYear().toString().slice(2) +
+                                            ("0" + (selectedDate.getMonth() + 1)).slice(-2) +
+                                            ("0" + selectedDate.getDate()).slice(-2);
+                                let time = ("0" + selectedDate.getHours()).slice(-2) + 
+                                            ("0" + selectedDate.getMinutes()).slice(-2);
+                                await fetch('/reminder/modify', {
+                                    method: 'PUT',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({ id ,content, date, time }),
+                                });
+                                location.reload();
+                            });        
+                            modifycontent.addEventListener('keydown', confirmOnEnter);
+                        }catch (error) {
+                            console.error(error);
+                        }
+                    });
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+
+        // 채팅을 화면에 추가하는 함수
+        function appendMessage(role, content) {
+            if (role=='user'){
+                const message = document.createElement('div');
+                message.classList.add('message', role);
+                message.innerText = content;
+                chatLog.appendChild(message);
+                chatLog.scrollTop = chatLog.scrollHeight;
+            }else{
+                const message = document.createElement('div');
+                const type = document.createElement('div');
+                message.classList.add('message', role);
+                type.classList.add('type')
+                message.innerText = content.slice(1);
+                type.innerText =content.charAt(0);
+                chatLog.appendChild(message);
+                chatLog.appendChild(type);
+                chatLog.scrollTop = chatLog.scrollHeight;
+            }
+        }
+
+        //gpt 대답을 출력하는 함수
+        function displayAIReply(reply) {
+            const aiMessage = document.createElement('div');
+            const type = document.createElement('div');
+            aiMessage.classList.add('message', 'ai');
+            type.classList.add('type')
+            aiMessage.innerText = reply.slice(1);
+            type.innerText =reply.charAt(0);
+            chatLog.appendChild(aiMessage);
+            chatLog.appendChild(type);
+            chatLog.scrollTop = chatLog.scrollHeight;
+        }
+
+        // 유저가 채팅을 입력하고 전송할 때의 이벤트 핸들러
+        sendButton.addEventListener('click', async () => {
+            if(userInput.value != ''){
+                const userMessage = userInput.value;
+                appendMessage('user', userMessage);
+                userInput.value = '';
+                // 서버로 채팅 보내기
+                const response = await sendMessageToGPT(userMessage);
+                const aiReply = response.reply;
+                displayAIReply(aiReply); // GPT의 응답을 출력
+                const utterance = new SpeechSynthesisUtterance(aiReply.slice(1));
+                mySynth.speak(utterance); //tts 출력
+                // type =2,3,4일때 새로고침
+                if (aiReply.charAt(0) == 2 || aiReply.charAt(0) == 3 || aiReply.charAt(0) == 4 ) location.reload();
+            }
+        });
+
+        //서버에 채팅 보내는 함수
+        async function sendMessageToGPT(message) {
+            const response = await fetch('/chat/send-message', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ message })
+            });
+            return response.json();
+        }
+
+        // 유저가 리마인더를 입력하고 전송할 때의 이벤트 핸들러
+        saveButton.addEventListener('click', async () => {
+            const currentDate = new Date();
+            const year = currentDate.getFullYear().toString().slice(-2);
+            const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+            const day = String(currentDate.getDate()).padStart(2, '0');
+            const content = memo.value;
+            const selectedDate = new Date(timeinput.value);
+            let date = selectedDate.getFullYear().toString().slice(2) +
+                           ("0" + (selectedDate.getMonth() + 1)).slice(-2) +
+                           ("0" + selectedDate.getDate()).slice(-2);
+            let time = ("0" + selectedDate.getHours()).slice(-2) + 
+                         ("0" + selectedDate.getMinutes()).slice(-2);
+            await fetch('/reminder', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ content, date, time }),
+            });
+            location.reload();
+        });
+    </script>
+</body>
+</html>
+

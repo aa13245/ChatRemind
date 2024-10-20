@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=0.8">
+    <title>ChatRemind - 비밀번호 변경</title>
+    <link rel="stylesheet" href="public/styleslogin.css">
+</head>
+<body>
+    <div class="layout">
+        <a href="/"><button id="logo">ChatRemind</button></a>
+    </div>
+</body>
+<body>
+    <div class="login-container">
+        <form action="/auth/change-pw" method="post">
+            <input id="typing-container" type="password" name="present_pw" placeholder="현재 비밀번호" required autofocus>
+            <input id="typing-container" type="password" name="new_pw" placeholder="새 비밀번호">
+            <input id="typing-container" type="password" name="new_pw_verification" placeholder="새 비밀번호 확인">
+            <% if (typeof messages !== 'undefined' && messages.joinError) { %>
+                <div class="error-message"><%= messages.joinError %></div>
+            <% } %>
+            <button id="joinsubmit-button" class="btn" type="submit">변경하기</button>
+        </form>
+        <a href="/mypage"><button id="join-button">이전으로</button></a>
+    </div>
+</body>
+</html>

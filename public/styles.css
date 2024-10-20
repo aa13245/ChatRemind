@@ -1,0 +1,240 @@
+/* styles.css */
+
+/* 전체 화면 스타일 */
+body {
+    font-family: 'Noto Sans KR', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f7f46e;
+}
+
+.layout{
+    max-width: 500px;
+    margin: 20px auto 10px auto;
+    background-color: #ffffff00;
+    color: #ffffff00;
+    box-sizing: border-box;
+    
+}
+
+#logo{
+    margin-right:187px;
+    background-color: #ffffff00;
+    color:#32422f;
+    border: none;
+    font-size: 25px;
+    cursor: pointer;
+}
+
+#logout-button{
+    cursor: pointer;
+    background-color: #ffffff00;
+    color:#6b6b6b;
+    border: none;
+}
+
+#line {
+    margin: 0px 5px 0px 0px;
+    background-color: #ffffff;
+    border-left: 1px solid #e7e7e7;
+    color: #fff;
+}
+
+.chat-container {
+    width: 500px;
+    margin: 5px auto 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 13px;
+    box-sizing: border-box;
+}
+
+/* 채팅 로그 스타일 */
+#chat-log {
+    height: 350px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 13px;
+}
+#chat-log::-webkit-scrollbar {
+    width: 6px;
+}
+#chat-log::-webkit-scrollbar-button {
+    width: 16px;
+    border: 0px solid #3d3030;
+    padding: 5px;
+    margin: 5px;
+}
+#chat-log::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 5px;
+}
+#chat-log::-webkit-scrollbar-thumb:hover {
+    background: #a3a3a3;
+}
+
+/* 메시지 스타일 */
+.message {
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 13px;
+    max-width: 70%;
+    clear: both;
+}
+
+.user {
+    margin-left: auto;
+    text-align: right;
+    background-color: #7e9b57;
+    color: #fff;
+    float: right;
+}
+
+.ai {
+    margin-right: auto;
+    text-align: left;
+    background-color: #f5f5f5;
+    float: left;
+}
+
+.type {
+    margin: 15px 0 0 5px;
+    background-color: #ffffff;
+    float: left;
+    color: #ccc;
+    font-size: 12px;
+}
+
+/* 입력창 및 버튼 스타일 */
+#user-input {
+    width: 330px;
+    padding: 10px;
+    margin-right: 5px;
+    border: 1px solid #ccc;
+    border-radius: 13px;
+}
+#user-input:focus {
+    outline: none;
+    border: 1px solid #6b6b6b;
+}
+
+#send-button {
+    padding: 10px 13px;
+    background-color: #7e9b57;
+    border: none;
+    border-radius: 13px;
+    color: #fff;
+    cursor: pointer;
+}
+#send-button:hover {
+    background-color: #6d884c;
+}
+
+#mic {
+    padding: 10px 10px;
+    background-color: #eeeeee;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+}
+#mic:hover {
+    background-color: #d8d8d8;
+}
+
+/* 리마인더 작성 */
+#memo {
+    width: 95%;
+    padding: 10px;
+    margin-right: 13px;
+    border: 0px;
+    border-bottom: 1px solid #ccc;
+}
+#memo:focus {
+    outline: none;
+    border-bottom: 1px solid #6b6b6b;
+}
+
+#reminder-time {
+    margin: 23px 0 7px 5px;
+    border:  0px;
+    background-color: #ffffff;
+    font-family: 'Noto Sans KR', sans-serif;
+}
+#reminder-time:focus {
+    outline: none;
+    border: 1px solid #6b6b6b;
+}
+
+#save-button {
+    padding: 10px 13px;
+    margin: 13px 0px 0px 0px;
+    background-color: #7e9b57;
+    border: none;
+    border-radius: 20px;
+    color: #fff;
+    cursor: pointer;
+    float: right;
+    clear: both;
+}
+#save-button:hover {
+    background-color: #6d884c;
+}
+
+.daytime-container  {
+    font-size: 12px;
+    background-color: #ffffff;
+    width: 50%;
+}
+
+.del-button {
+    float: right;
+    margin: 0px 10px 0px 0px;
+    background-color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    color: #aaaaaa;
+    cursor: pointer;
+}
+
+.memo-modify {
+    width: 95%;
+    padding: 10px;
+    margin-right: 13px;
+    border: 0px;
+    border-bottom: 1px solid #ccc;
+}
+.memo-modify:focus {
+    outline: none;
+    border-bottom: 1px solid #6b6b6b;
+}
+
+.cancel-button {
+    padding: 10px 13px;
+    margin: 13px 0 0px 146px;
+    background-color: #ffffff;
+    border: none;
+    border-radius: 20px;
+    color: #000000;
+    cursor: pointer;
+}
+.cancel-button:hover {
+    background-color: #d8d8d8;
+}
+
+.confirm-button {
+    padding: 10px 13px;
+    margin: 13px 0px 0px 0px;
+    background-color: #7e9b57;
+    border: none;
+    border-radius: 20px;
+    color: #fff;
+    cursor: pointer;
+    float: right;
+    clear: both;
+}
+.confirm-button:hover {
+    background-color: #6d884c;
+}

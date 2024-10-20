@@ -1,0 +1,287 @@
+body {
+    font-family: 'Noto Sans KR', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f7f46e;
+}
+
+.layout{
+    max-width: 400px;
+    margin: 20px auto 10px auto;
+    background-color: #ffffff00;
+    color: #ffffff00;
+    box-sizing: border-box;
+    
+}
+
+#logo{
+    margin-right:177px;
+    background-color: #ffffff00;
+    color:#32422f;
+    border: none;
+    font-size: 25px;
+    cursor: pointer;
+}
+
+#logout-button{
+    cursor: pointer;
+    background-color: #ffffff00;
+    color:#6b6b6b;
+    border: none;
+}
+
+.container {
+    width: 400px;
+    margin: 5px auto 20px auto;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 13px;
+    box-sizing: border-box;
+}
+
+.area {
+    border-bottom: 1px solid #e7e7e7;
+}
+
+#subject{
+    margin: 25px 0 10px 25px;
+    border: 0;
+    background-color: #ffffff;
+    font-size: 20px;
+    max-width: 30%;
+}
+
+#id{
+    color: #353535;
+    margin: 25px 10px 25px 30px;
+    font-size: 14px;
+    float: left;
+}
+
+#id-value{
+    margin: 25px 0 25px 40px;
+    border: 0;
+    background-color: #ffffff;
+    color: #353535;
+    font-size: 14px;
+}
+
+#change-password{
+    padding: 18px 30px;
+    background-color: #ffffff;
+    border: 0px solid #ffffff;
+    color: #353535;
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+}
+#change-password:hover {
+    outline: none;
+    background-color: #f7f7f7;
+}
+
+#withdrawal-button {
+    padding: 18px 30px;
+    background-color: #ffffff;
+    border: 0px solid #ffffff;
+    border-bottom-left-radius: 13px;
+    border-bottom-right-radius: 13px;
+    color: #353535;
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+}
+#withdrawal-button:hover {
+    outline: none;
+    background-color: #f7f7f7;
+}
+
+#text{
+    color: #353535;
+    margin: 39px 0 10px 30px;
+    font-size: 14px;
+    float: left;
+}
+
+#user-name {
+    width: 128px;
+    padding: 10px;
+    margin: 30px 10px 0px 0;
+    border: 1px solid #ccc;
+    border-radius: 13px;
+    float: right;
+}
+#user-name:focus {
+    outline: none;
+    border: 1px solid #6b6b6b;
+}
+
+#chatbot-name {
+    width: 128px;
+    padding: 10px;
+    margin: 30px 10px 0px 0;
+    border: 1px solid #ccc;
+    border-radius: 13px;
+    float: right;
+}
+#chatbot-name:focus {
+    outline: none;
+    border: 1px solid #6b6b6b;
+}
+
+#memory {
+    width: 128px;
+    padding: 10px;
+    margin: 30px 10px 0px 0;
+    border: 1px solid #ccc;
+    border-radius: 13px;
+    float: right;
+}
+#memory:focus {
+    outline: none;
+    border: 1px solid #6b6b6b;
+}
+
+#api {
+    width: 128px;
+    padding: 10px;
+    margin: 30px 10px 30px 0;
+    border: 1px solid #ccc;
+    border-radius: 13px;
+    float: right;
+}
+#api:focus {
+    outline: none;
+    border: 1px solid #6b6b6b;
+}
+
+#save-button1 {
+    padding: 10px 13px;
+    margin: 29px 30px 0 0px;
+    background-color: #7e9b57;
+    border: none;
+    border-radius: 13px;
+    color: #fff;
+    cursor: pointer;
+    float: right;
+}
+#save-button1:hover {
+    background-color: #6d884c;
+}
+
+#save-button2 {
+    padding: 10px 13px;
+    margin: 30px 30px 0 0px;
+    background-color: #7e9b57;
+    border: none;
+    border-radius: 13px;
+    color: #fff;
+    cursor: pointer;
+    float: right;
+    clear: both;
+}
+#save-button2:hover {
+    background-color: #6d884c;
+}
+
+#save-button4 {
+    padding: 10px 13px;
+    margin: 30px 30px 0 0px;
+    background-color: #7e9b57;
+    border: none;
+    border-radius: 13px;
+    color: #fff;
+    cursor: pointer;
+    float: right;
+    clear: both;
+}
+#save-button4:hover {
+    background-color: #6d884c;
+}
+
+#save-button3 {
+    padding: 10px 13px;
+    margin: 30px 30px 0px 0px;
+    background-color: #7e9b57;
+    border: none;
+    border-radius: 13px;
+    color: #fff;
+    cursor: pointer;
+    float: right;
+    clear: both;
+}
+#save-button3:hover {
+    background-color: #6d884c;
+}
+
+#set-model1 {
+    padding: 10px 30px;
+    margin: 0 0 30px 64px;
+    background-color: #ffffff;
+    border-top-left-radius: 13px;
+    border-bottom-left-radius: 13px;
+    color: #353535;
+    border: 1px solid #ccc;
+    cursor: pointer;
+}
+#set-model1:hover {
+    background-color: #ccc;
+}
+
+#set-model2 {
+    padding: 10px 51px;
+    margin-left: -7px;
+    background-color: #ffffff;
+    border-top-right-radius: 13px;
+    border-bottom-right-radius: 13px;
+    color: #353535;
+    border: 1px solid #ccc;
+    cursor: pointer;
+}
+#set-model2:hover {
+    background-color: #ccc;
+}
+
+#set-model1-selected {
+    padding: 10px 30px;
+    margin: 0 0 30px 64px;
+    background-color: #ccc;
+    border-top-left-radius: 13px;
+    border-bottom-left-radius: 13px;
+    color: #353535;
+    border: 1px solid #ccc;
+    cursor: pointer;
+}
+#set-model1-selected:hover {
+    background-color: #ccc;
+}
+
+#set-model2-selected {
+    padding: 10px 51px;
+    margin-left: -7px;
+    background-color: #ccc;
+    border-top-right-radius: 13px;
+    border-bottom-right-radius: 13px;
+    color: #353535;
+    border: 1px solid #ccc;
+    cursor: pointer;
+}
+#set-model2-selected:hover {
+    background-color: #ccc;
+}
+
+#del-button {
+    padding: 18px 30px;
+    background-color: #ffffff;
+    border: 0px solid #ffffff;
+    border-bottom-left-radius: 13px;
+    border-bottom-right-radius: 13px;
+    color: #353535;
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+}
+#del-button:hover {
+    outline: none;
+    background-color: #f7f7f7;
+}

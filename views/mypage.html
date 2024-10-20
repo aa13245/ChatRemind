@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=0.8">
+    <title>ChatRemind - 마이페이지</title>
+    <link rel="stylesheet" href="public/stylesmypage.css">
+</head>
+<body>
+    <div class="layout">
+        <a href="/"><button id="logo">ChatRemind</button></a>
+        <a href="/auth/logout"><button id="logout-button">로그아웃</button></a>
+    </div>
+</body>
+<body>
+    <div class="container">
+        <button id="subject">계정 설정</button>
+        <div class = "area">
+            <a id="id">아이디</a>
+            <button id="id-value"></button>
+        </div>
+        <div class = "area">
+            <a href="/changepw"><button id="change-password">비밀번호 변경</button></a>
+        </div>
+        <a href="/withdrawal"><button id="withdrawal-button">계정 삭제</button></a>
+    </div>
+    <div class="container">
+        <button id="subject">채팅 설정</button>
+        <div class = "area">
+            <div>
+              </div>
+            <button id="save-button1" type="submit">저장</button>
+            <input id="user-name">
+            <a id = "text">내 이름</a>
+            <button id="save-button2" type="submit">저장</button>
+            <input id="chatbot-name">
+            <a id = "text">챗봇 이름</a>
+            <button id="save-button4" type="submit">저장</button>
+            <input id="memory">
+            <a id = "text">챗봇 대화 기억력</a>
+            <button id="save-button3" type="submit">저장</button>
+            <input id="api">
+            <a id = "text">OPENAI_API_KEY</a>
+            <button id="set-model1-selected" type="submit">gpt-3.5-turbo</button>
+            <button id="set-model2" type="submit">gpt-4</button>
+            <button id="set-model1" type="submit">gpt-3.5-turbo</button>
+            <button id="set-model2-selected" type="submit">gpt-4</button>
+        </div>
+        <button id="del-button">채팅 기록 삭제</button>
+    </div>
+    <script>
+        const userid = document.getElementById('id-value');
+        const nameinput1 = document.getElementById('user-name');
+        const nameinput2 = document.getElementById('chatbot-name');
+        const APIinput = document.getElementById('api');
+        const memoryinput = document.getElementById('memory');
+        const set_model1 = document.getElementById('set-model1');
+        const set_model2 = document.getElementById('set-model2');
+        const set_model1_selected = document.getElementById('set-model1-selected');
+        const set_model2_selected = document.getElementById('set-model2-selected');
+        
+        //저장된 유저 프로필 정보 불러오기
+        fetch('/mypage/getprofile')
+            .then(response => response.json())
+            .then(data => {
+                const id = data.id;
+                const username = data.username;
+                const chatbotname = data.chatbotname;
+                const memory = data.memory;
+                userid.innerText = id;
+                nameinput1.value = username;
+                nameinput2.value = chatbotname;
+                memoryinput.value = memory;
+                const model = data.gptmodel;
+                if (model == 'gpt-3.5-turbo'){
+                    set_model1.remove();
+                    set_model2_selected.remove();
+                }
+                if (model == 'gpt-4'){
+                    set_model2.remove();
+                    set_model1_selected.remove();
+                }
+            })
+
+        //유저 이름 저장 버튼 이벤트
+        const savebutton1 = document.getElementById("save-button1")
+        savebutton1.addEventListener('click', async () => {
+            const username = nameinput1.value;
+            await fetch(`/mypage/usernamesave/${username}`, {method: 'PUT'});
+            alert("저장 완료");
+        });
+        //이름 입력창에서 엔터 키를 눌렀을 때 저장
+        function Save1OnEnter(event){
+            if(event.key === 'Enter'){
+                savebutton1.click();
+            }
+        }
+        nameinput1.addEventListener('keydown',Save1OnEnter);
+
+        //챗봇 이름 저장 버튼 이벤트
+        const savebutton2 = document.getElementById("save-button2")
+        savebutton2.addEventListener('click', async () => {
+            const chatbotname = nameinput2.value;
+            await fetch(`/mypage/chatbotnamesave/${chatbotname}`, {method: 'PUT'});
+            alert("저장 완료");
+        });
+        //이름 입력창에서 엔터 키를 눌렀을 때 저장
+        function Save2OnEnter(event){
+            if(event.key === 'Enter'){
+                savebutton2.click();
+            }
+        }
+        nameinput2.addEventListener('keydown',Save2OnEnter);
+
+        //memory 저장 버튼 이벤트
+        const savebutton4 = document.getElementById("save-button4")
+        savebutton4.addEventListener('click', async () => {
+            const memory = memoryinput.value;
+            await fetch(`/mypage/memorysave/${memory}`, {method: 'PUT'});
+            alert("저장 완료");
+        });
+        //입력창에서 엔터 키를 눌렀을 때 저장
+        function Save4OnEnter(event){
+            if(event.key === 'Enter'){
+                savebutton4.click();
+            }
+        }
+        memoryinput.addEventListener('keydown',Save4OnEnter);
+
+        //GptApiKey 저장 버튼 이벤트
+        const savebutton3 = document.getElementById("save-button3")
+        savebutton3.addEventListener('click', async () => {
+            const api = APIinput.value;
+            await fetch(`/mypage/gptapisave/${api}`, {method: 'PUT'});
+            alert("저장 완료");
+        });
+        //key 입력창에서 엔터 키를 눌렀을 때 저장
+        function Save3OnEnter(event){
+            if(event.key === 'Enter'){
+                savebutton3.click();
+            }
+        }
+        APIinput.addEventListener('keydown',Save3OnEnter);
+
+        //모델 선택
+        function choosemodel1(){
+            const model = 'gpt-3.5-turbo'
+            try{
+                fetch(`/mypage/choosemodel/${model}`, {method: 'PUT'});
+            } catch (error) {
+                console.error(error);
+            }    
+        }
+        function choosemodel2(){
+            const model = 'gpt-4'
+            try{
+                fetch(`/mypage/choosemodel/${model}`, {method: 'PUT'});
+            } catch (error) {
+                console.error(error);
+            }    
+        }
+        set_model1.addEventListener('click', async () => {
+            await choosemodel1();
+            location.reload();
+        });
+        set_model1_selected.addEventListener('click', async () => {
+            await choosemodel1();
+            location.reload();
+        });
+        set_model2.addEventListener('click', async () => {
+            await choosemodel2();
+            location.reload();
+        });
+        set_model2_selected.addEventListener('click', async () => {
+            await choosemodel2();
+            location.reload();
+        });
+
+        //채팅 기록 삭제 버튼 이벤트
+        const del_log = document.getElementById('del-button');
+        del_log.addEventListener('click', async () => {
+            try {
+                const confirmed = confirm("채팅 기록을 삭제하시겠습니까?");
+                if (confirmed){
+                    await fetch('/mypage/deletelog', {method: 'DELETE'});
+                    location.reload();
+                };
+            } catch (error) {
+                console.error(error);
+            }            
+        });
+    </script>
+</body>
+</html>
